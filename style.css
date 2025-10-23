@@ -1,0 +1,68 @@
+:root {
+  --bg: #070707;
+  --panel: #0f0f10;
+  --accent: #d13b3b;
+  --muted: #bdbdbd;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(0deg, #050505 0%, #0f0f12 100%);
+  font-family: 'Oswald', sans-serif;
+  color: #fff;
+  overflow: hidden;
+}
+
+.overlay {
+  width: 1280px;
+  height: 180px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 12px;
+  background: rgba(0,0,0,0.1);
+  backdrop-filter: blur(2px);
+}
+
+.header {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 0 6px #d13b3b, 0 0 12px rgba(209,59,59,0.4);
+}
+
+.middle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.middle-item {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
+  min-width: 120px;
+  text-align: center;
+}
+
+.middle-item.score {
+  color: #d13b3b;
+}
+
+.bottom-row {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  color: #fff;
+}
+
+@media (max-width:1280px){
+  .overlay{transform:scale(0.9); transform-origin:center;}
+}

@@ -61,8 +61,8 @@ async function fetchAndUpdate() {
       lastData = data;
 
       roundEl.textContent = roundNum ? "Round " + roundNum : "Round";
-      teamANameEl.textContent = teamANum ? "Team " + teamANum : "Team A";
-      teamBNameEl.textContent = teamBNum ? "Team " + teamBNum : "Team B";
+      teamANameEl.textContent = teamANum ? "Team " + teamANum : "Team";
+      teamBNameEl.textContent = teamBNum ? "Team " + teamBNum : "Team";
       scoreAEl.textContent = teamAPts || "0";
       scoreBEl.textContent = teamBPts || "0";
       matchEl.textContent = matchNum ? "Match " + matchNum : "Match";
@@ -77,3 +77,4 @@ setInterval(fetchAndUpdate, FETCH_INTERVAL_MS);
 </script>
 </body>
 </html>
+

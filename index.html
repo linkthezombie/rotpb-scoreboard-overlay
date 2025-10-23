@@ -23,6 +23,12 @@
 
 <script src="config.js"></script>
 <script>
+// Simple CSV parser
+function parseCSV(text){
+  const lines = text.split(/\r?\n/).filter(l => l.trim().length>0);
+  return lines.map(line => line.split(',').map(c => c.replace(/^"|"$/g,'').trim()));
+}
+
 // DOM Elements
 const teamANameEl = document.getElementById('teamAName');
 const teamBNameEl = document.getElementById('teamBName');
@@ -31,62 +37,43 @@ const scoreBEl = document.getElementById('scoreB');
 const matchEl = document.getElementById('matchLabel');
 const roundEl = document.getElementById('roundLabel');
 
-// History of seen numeric values
-let seenValues = new Set();
-let lastApplied = {matchNum:null, roundNum:null, teamANum:null, teamAPts:null, teamBNum:null, teamBPts:null};
+let lastData = null;
 
-// Parse Google Sheets JSON feed
-function parseSheetJSON(text) {
-    const jsonText = text.replace(/.*?({.*});?$/, "$1");
-    return JSON.parse(jsonText);
-}
+async function fetchAndUpdate() {
+  try {
+    const res = await fetch(SHEET_CSV_URL, {cache:"no-store"});
+    if (!res.ok) throw new Error("Fetch failed: " + res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
 
-// Fetch and update overlay
-async function fetchAndUpdateJSON() {
-    try {
-        const url = SHEET_CSV_URL.replace("output=csv","gviz/tq?tqx=out:json&sheet=Active%20Game%20Tracker");
-        const res = await fetch(url, {cache:"no-store"});
-        if(!res.ok) throw new Error("Fetch failed: " + res.status);
-        const text = await res.text();
-        const data = parseSheetJSON(text);
-        const rows = data.table.rows;
+    const c = i => (rows[i] && rows[i][2] !== undefined) ? rows[i][2] : "";
 
-        const getC = (rowIndex) => (rows[rowIndex] && rows[rowIndex].c[2] ? rows[rowIndex].c[2].v : "");
+    const matchNum = c(START_ROW_INDEX) || "";
+    const roundNum = c(START_ROW_INDEX + 1) || "";
+    const teamANum = c(START_ROW_INDEX + 2) || "";
+    const teamAPts = c(START_ROW_INDEX + 3) || "";
+    const teamBNum = c(START_ROW_INDEX + 4) || "";
+    const teamBPts = c(START_ROW_INDEX + 5) || "";
 
-        const matchNum = getC(1);
-        const roundNum = getC(2);
-        const teamANum = getC(3);
-        const teamAPts = getC(4);
-        const teamBNum = getC(5);
-        const teamBPts = getC(6);
+    const data = {matchNum, roundNum, teamANum, teamAPts, teamBNum, teamBPts};
 
-        const currentValues = {matchNum, roundNum, teamANum, teamAPts, teamBNum, teamBPts};
-        const key = Object.values(currentValues).join('|');
+    if(JSON.stringify(data) !== JSON.stringify(lastData)){
+      lastData = data;
 
-        // Apply only if this combination has never been seen
-        if(!seenValues.has(key)){
-            seenValues.add(key);
-            lastApplied = currentValues;
-
-            roundEl.textContent = roundNum ? "Round " + roundNum : "Round";
-            teamANameEl.textContent = teamANum ? "Team " + teamANum : "Team A";
-            teamBNameEl.textContent = teamBNum ? "Team " + teamBNum : "Team B";
-            scoreAEl.textContent = teamAPts || "0";
-            scoreBEl.textContent = teamBPts || "0";
-            matchEl.textContent = matchNum ? "Match " + matchNum : "Match";
-
-            // Optional: keep history size reasonable
-            if(seenValues.size > 50) seenValues.clear();
-        }
-
-    } catch(err){
-        console.error("Error fetching/parsing JSON feed:", err);
+      roundEl.textContent = roundNum ? "Round " + roundNum : "Round";
+      teamANameEl.textContent = teamANum ? "Team " + teamANum : "Team A";
+      teamBNameEl.textContent = teamBNum ? "Team " + teamBNum : "Team B";
+      scoreAEl.textContent = teamAPts || "0";
+      scoreBEl.textContent = teamBPts || "0";
+      matchEl.textContent = matchNum ? "Match " + matchNum : "Match";
     }
+  } catch(err){
+    console.error("Error fetching/parsing CSV:", err);
+  }
 }
 
-// Initial fetch + set 5-second interval
-fetchAndUpdateJSON();
-setInterval(fetchAndUpdateJSON, 5000);
+fetchAndUpdate();
+setInterval(fetchAndUpdate, FETCH_INTERVAL_MS);
 </script>
 </body>
 </html>

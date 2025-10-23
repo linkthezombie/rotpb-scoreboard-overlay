@@ -1,2 +1,1 @@
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkSwTUK6z1ASpdgoSDdKk45qWVN3VsW4v7OSgjmTt432KTwUKNi0wMqbxsr-RXBkq8I8jlI4VFiCcF/pub?gid=0&single=true&output=csv";
-const FETCH_INTERVAL_MS = 5000;
+const FETCH_INTERVAL_MS = 2000;

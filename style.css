@@ -4,7 +4,6 @@
   --accent: #d13b3b;
   --muted: #bdbdbd;
 }
-
 html, body {
   height: 100%;
   margin: 0;
@@ -13,7 +12,6 @@ html, body {
   color: #fff;
   overflow: hidden;
 }
-
 .overlay {
   width: 1280px;
   height: 180px;
@@ -27,7 +25,6 @@ html, body {
   background: rgba(0,0,0,0.1);
   backdrop-filter: blur(2px);
 }
-
 .header {
   font-size: 28px;
   font-weight: 700;
@@ -35,7 +32,6 @@ html, body {
   color: #fff;
   text-shadow: 0 0 6px #d13b3b, 0 0 12px rgba(209,59,59,0.4);
 }
-
 .middle-row {
   display: flex;
   align-items: center;
@@ -43,7 +39,6 @@ html, body {
   width: 100%;
   margin: 8px 0;
 }
-
 .middle-item {
   font-size: 24px;
   font-weight: 600;
@@ -51,18 +46,15 @@ html, body {
   min-width: 120px;
   text-align: center;
 }
-
 .middle-item.score {
   color: #d13b3b;
 }
-
 .bottom-row {
   font-size: 20px;
   font-weight: 600;
   text-align: center;
   color: #fff;
 }
-
 @media (max-width:1280px){
   .overlay{transform:scale(0.9); transform-origin:center;}
 }

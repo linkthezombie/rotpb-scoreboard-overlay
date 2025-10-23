@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DBD Score Overlay Alt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Same as index.html, just different file name for convenience -->
+<div class="overlay">
+  <div class="header">Realm of the Pink Ribbon Tourney</div>
+  <div class="middle-row">
+    <div class="middle-item" id="roundLabel">Round 1</div>
+    <div class="middle-item" id="teamAName">Team 1</div>
+    <div class="middle-item score" id="scoreA">0</div>
+    <div class="middle-item" id="teamBName">Team 2</div>
+    <div class="middle-item score" id="scoreB">0</div>
+  </div>
+  <div class="bottom-row" id="matchLabel">Match 1</div>
+</div>
+<script src="config.js"></script>
+<script>
+const teamANameEl=document.getElementById('teamAName');
+const teamBNameEl=document.getElementById('teamBName');
+const scoreAEl=document.getElementById('scoreA');
+const scoreBEl=document.getElementById('scoreB');
+const matchEl=document.getElementById('matchLabel');
+const roundEl=document.getElementById('roundLabel');
+let seenValues=new Set();
+function parseCSV(text){const lines=text.split(/\r?\n/).filter(l=>l.trim().length>0);return lines.map(line=>line.split(',').map(c=>c.replace(/^"|"$/g,'').trim()));}
+async function fetchAndUpdateCSV(){
+    try{
+        const url=SHEET_CSV_URL+"&cb="+new Date().getTime();
+        const res=await fetch(url,{cache:"no-store"});
+        if(!res.ok)throw new Error("Fetch failed: "+res.status);
+        const text=await res.text();
+        const rows=parseCSV(text);
+        const getC=(rowIndex)=>(rows[rowIndex]&&rows[rowIndex][2]!==undefined)?rows[rowIndex][2]:"";
+        const matchNum=getC(1);
+        const roundNum=getC(2);
+        const teamANum=getC(3);
+        const teamAPts=getC(4);
+        const teamBNum=getC(5);
+        const teamBPts=getC(6);
+        const currentValues={matchNum,roundNum,teamANum,teamAPts,teamBNum,teamBPts};
+        const key=Object.values(currentValues).join('|');
+        if(!seenValues.has(key)){
+            seenValues.add(key);
+            roundEl.textContent=roundNum?"Round "+roundNum:"Round";
+            teamANameEl.textContent=teamANum?"Team "+teamANum:"Team A";
+            teamBNameEl.textContent=teamBNum?"Team "+teamBNum:"Team B";
+            scoreAEl.textContent=teamAPts||"0";
+            scoreBEl.textContent=teamBPts||"0";
+            matchEl.textContent=matchNum?"Match "+matchNum:"Match";
+            if(seenValues.size>50)seenValues.clear();
+        }
+    }catch(err){console.error("Error fetching/parsing CSV:",err);}
+}
+fetchAndUpdateCSV();
+setInterval(fetchAndUpdateCSV,5000);
+</script>
+</body>
+</html>

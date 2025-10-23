@@ -33,8 +33,6 @@ const roundEl = document.getElementById('roundLabel');
 
 // History of seen numeric values
 let seenValues = new Set();
-
-// Track last applied values
 let lastApplied = {matchNum:null, roundNum:null, teamANum:null, teamAPts:null, teamBNum:null, teamBPts:null};
 
 // Parse Google Sheets JSON feed
@@ -43,7 +41,7 @@ function parseSheetJSON(text) {
     return JSON.parse(jsonText);
 }
 
-// Fetch and update with debounce / history filter
+// Fetch and update overlay
 async function fetchAndUpdateJSON() {
     try {
         const url = SHEET_CSV_URL.replace("output=csv","gviz/tq?tqx=out:json&sheet=Active%20Game%20Tracker");
@@ -63,11 +61,9 @@ async function fetchAndUpdateJSON() {
         const teamBPts = getC(6);
 
         const currentValues = {matchNum, roundNum, teamANum, teamAPts, teamBNum, teamBPts};
-
-        // Create a simple string key of values
         const key = Object.values(currentValues).join('|');
 
-        // If we have never seen this combination, apply it
+        // Apply only if this combination has never been seen
         if(!seenValues.has(key)){
             seenValues.add(key);
             lastApplied = currentValues;
@@ -79,13 +75,18 @@ async function fetchAndUpdateJSON() {
             scoreBEl.textContent = teamBPts || "0";
             matchEl.textContent = matchNum ? "Match " + matchNum : "Match";
 
-            // Optional: limit the size of seenValues to prevent memory bloat
+            // Optional: keep history size reasonable
             if(seenValues.size > 50) seenValues.clear();
         }
 
     } catch(err){
-        console.error
+        console.error("Error fetching/parsing JSON feed:", err);
+    }
+}
+
+// Initial fetch + set 5-second interval
+fetchAndUpdateJSON();
+setInterval(fetchAndUpdateJSON, 5000);
 </script>
 </body>
 </html>
-

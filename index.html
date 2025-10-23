@@ -57,7 +57,7 @@ async function fetchAndUpdateCSV(){
     } catch(err){console.error("Error fetching/parsing CSV:",err);}
 }
 fetchAndUpdateCSV();
-setInterval(fetchAndUpdateCSV,5000);
+setInterval(fetchAndUpdateCSV,FETCH_INTERVAL_MS);
 </script>
 </body>
 </html>
